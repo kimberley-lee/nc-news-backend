@@ -4,9 +4,10 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
 const endpoints = require("../endpoints.json");
+const toBeSortedBy = require("jest-sorted");
 
 afterAll(() => {
-  db.end();
+  return db.end();
 });
 
 beforeEach(() => {
@@ -112,6 +113,17 @@ describe("/api/articles", () => {
           expect(typeof article.votes).toBe("number");
           expect(typeof article.comment_count).toBe("number");
         });
+      });
+  });
+  test.todo("GET 200: responds with the correct number of comments");
+
+  test("GET 200: responds with an array of article objects sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("created_at", { descending: true });
       });
   });
 });
