@@ -1,4 +1,4 @@
-const { fetchComments } = require("../models/comments.model");
+const { fetchComments, insertComments } = require("../models/comments.model");
 const { checkArticleIDExists } = require("../models/articles.model");
 
 const getComments = (req, res, next) => {
@@ -10,4 +10,13 @@ const getComments = (req, res, next) => {
     .catch(next);
 };
 
-module.exports = { getComments };
+const postComments = (req, res, next) => {
+  const { article_id } = req.params;
+  const { body, author } = req.body;
+  insertComments(article_id, body, author).then((comments) => {
+    console.log(comments);
+    res.status(201).send(comments);
+  });
+};
+
+module.exports = { getComments, postComments };

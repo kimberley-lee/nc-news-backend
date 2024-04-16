@@ -5,7 +5,10 @@ const {
   getArticlesById,
   getArticles,
 } = require("./controllers/articles.controller");
-const { getComments } = require("./controllers/comments.controller");
+const {
+  getComments,
+  postComments,
+} = require("./controllers/comments.controller");
 
 const app = express();
 
@@ -20,6 +23,8 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticlesById);
 
 app.get("/api/articles/:article_id/comments", getComments);
+
+app.post("/api/articles/:article_id/comments", postComments);
 
 //error handling middleware - extract
 app.use((err, req, res, next) => {
