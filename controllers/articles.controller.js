@@ -2,6 +2,7 @@ const {
   fetchArticlesById,
   fetchArticles,
   updateArticlesById,
+  checkArticleIDExists,
 } = require("../models/articles.model");
 const { insertComments } = require("../models/comments.model");
 
@@ -25,8 +26,11 @@ const getArticlesById = (req, res, next) => {
 const patchArticlesById = (req, res, next) => {
   const { article_id } = req.params;
   const { inc_votes } = req.body;
-  updateArticlesById(article_id, inc_votes)
-    .then((article) => {
+  Promise.all([
+    updateArticlesById(article_id, inc_votes),
+    checkArticleIDExists(article_id),
+  ])
+    .then(([article]) => {
       res.status(200).send({ article });
     })
     .catch(next);
