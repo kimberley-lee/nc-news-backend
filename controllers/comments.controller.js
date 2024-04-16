@@ -13,10 +13,11 @@ const getComments = (req, res, next) => {
 const postComments = (req, res, next) => {
   const { article_id } = req.params;
   const { body, author } = req.body;
-  insertComments(article_id, body, author).then((comments) => {
-    console.log(comments);
-    res.status(201).send(comments);
-  });
+  insertComments(article_id, body, author)
+    .then((comments) => {
+      res.status(201).send(comments);
+    })
+    .catch(next);
 };
 
 module.exports = { getComments, postComments };

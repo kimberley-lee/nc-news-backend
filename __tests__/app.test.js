@@ -228,4 +228,17 @@ describe("/api/articles/:article_id/comments", () => {
         });
       });
   });
+  test("POST 400: responds with an error message if user tries to post comment without body or author property", () => {
+    const newComment = {
+      body: "I'm a huge fan of cats.",
+    };
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Bad request");
+      });
+  });
 });
