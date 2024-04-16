@@ -202,4 +202,14 @@ describe("/api/articles/:article_id/comments", () => {
         expect(message).toBe("Bad request");
       });
   });
+
+  test("GET 200: responds with an empty array if article_id exists but has no comments associated with it", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments.length).toBe(0);
+      });
+  });
 });
