@@ -115,7 +115,6 @@ describe("/api/articles", () => {
         });
       });
   });
-  test.todo("GET 200: responds with the correct number of comments");
 
   test("GET 200: responds with an array of article objects sorted by date in descending order", () => {
     return request(app)
@@ -124,6 +123,19 @@ describe("/api/articles", () => {
       .then(({ body }) => {
         const { articles } = body;
         expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+
+  test("GET 200: responds with the correct number of comments", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        const firstArticle = articles.find((article) => {
+          return article.article_id === 9;
+        });
+        expect(firstArticle.comment_count).toBe(2);
       });
   });
 });
