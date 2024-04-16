@@ -207,4 +207,51 @@ describe("/api/articles/:article_id/comments", () => {
         expect(comments.length).toBe(0);
       });
   });
+
+  test("POST 201: responds with an object of specific properties", () => {
+    const newComment = {
+      body: "I'm not actually a fan of cats.",
+      author: "butter_bridge",
+    };
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          article_id: 2,
+          comment_id: 19,
+          votes: 0,
+          created_at: expect.any(String),
+          body: "I'm not actually a fan of cats.",
+          author: "butter_bridge",
+        });
+      });
+  });
+  test("POST 400: responds with an error message if user tries to post comment without body or author property", () => {
+    const newComment = {
+      body: "I'm a huge fan of cats.",
+    };
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Bad request");
+      });
+  });
+  test("POST 400: responds with an error message if user tries to post in the incorrect format", () => {
+    const newComment = {
+      author: 5,
+    };
+    return request(app)
+      .post("/api/articles/6/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Bad request");
+      });
+  });
 });

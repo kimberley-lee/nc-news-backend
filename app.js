@@ -5,7 +5,10 @@ const {
   getArticlesById,
   getArticles,
 } = require("./controllers/articles.controller");
-const { getComments } = require("./controllers/comments.controller");
+const {
+  getComments,
+  postComments,
+} = require("./controllers/comments.controller");
 
 const app = express();
 
@@ -21,6 +24,8 @@ app.get("/api/articles/:article_id", getArticlesById);
 
 app.get("/api/articles/:article_id/comments", getComments);
 
+app.post("/api/articles/:article_id/comments", postComments);
+
 //error handling middleware - extract
 app.use((err, req, res, next) => {
   if (err.status && err.message) {
@@ -31,7 +36,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  if (err.code === "22P02") {
+  if (err.code === "22P02" || err.code === "23502") {
     res.status(400).send({ message: "Bad request" });
   } else {
     next(err);

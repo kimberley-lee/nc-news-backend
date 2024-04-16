@@ -11,4 +11,12 @@ const fetchComments = (article_id) => {
     });
 };
 
-module.exports = { fetchComments };
+const insertComments = (article_id, body, author) => {
+  return db
+    .query(
+      `INSERT INTO comments(article_id, body, author) VALUES ($1, $2, $3) RETURNING *`,
+      [article_id, body, author]
+    )
+    .then(({ rows }) => rows[0]);
+};
+module.exports = { fetchComments, insertComments };
