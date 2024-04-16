@@ -138,4 +138,14 @@ describe("/api/articles", () => {
         expect(firstArticle.comment_count).toBe(2);
       });
   });
+
+  test("GET 200: responds with an array of object properties without the 'body' property", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).not.toHaveProperty("body");
+      });
+  });
 });
