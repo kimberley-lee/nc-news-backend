@@ -41,4 +41,19 @@ const checkArticleIDExists = (article_id) => {
       }
     });
 };
-module.exports = { fetchArticlesById, fetchArticles, checkArticleIDExists };
+
+const updateArticlesById = (id, votes) => {
+  return db
+    .query(
+      `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`,
+      [votes, id]
+    )
+    .then(({ rows }) => rows[0]);
+};
+
+module.exports = {
+  fetchArticlesById,
+  fetchArticles,
+  checkArticleIDExists,
+  updateArticlesById,
+};

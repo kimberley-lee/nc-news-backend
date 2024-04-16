@@ -74,7 +74,6 @@ describe("/api/articles/:article_id", () => {
         });
       });
   });
-
   test("GET 404: responds with an error if passed an article_id that doesn't exist", () => {
     return request(app)
       .get("/api/articles/100")
@@ -115,7 +114,6 @@ describe("/api/articles", () => {
         });
       });
   });
-
   test("GET 200: responds with an array of article objects sorted by date in descending order", () => {
     return request(app)
       .get("/api/articles")
@@ -125,7 +123,6 @@ describe("/api/articles", () => {
         expect(articles).toBeSortedBy("created_at", { descending: true });
       });
   });
-
   test("GET 200: responds with the correct number of comments", () => {
     return request(app)
       .get("/api/articles")
@@ -138,7 +135,6 @@ describe("/api/articles", () => {
         expect(firstArticle.comment_count).toBe(2);
       });
   });
-
   test("GET 200: responds with an array of object properties without the 'body' property", () => {
     return request(app)
       .get("/api/articles")
@@ -148,6 +144,28 @@ describe("/api/articles", () => {
         expect(articles).not.toHaveProperty("body");
       });
   });
+});
+test("PATCH 200: responds with an object of an updated article", () => {
+  const update = {
+    inc_votes: 1,
+  };
+  return request(app)
+    .patch("/api/articles/1")
+    .expect(200)
+    .send(update)
+    .then(({ body }) => {
+      const { article } = body;
+      expect(article).toMatchObject({
+        title: "Living in the shadow of a great man",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "I find this existence challenging",
+        created_at: expect.any(String),
+        votes: 101,
+        article_img_url:
+          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+      });
+    });
 });
 
 describe("/api/articles/:article_id/comments", () => {
