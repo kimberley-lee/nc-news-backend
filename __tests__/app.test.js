@@ -150,11 +150,6 @@ describe("/api/articles", () => {
   });
 });
 
-// test for an array of comments of the given article id with specific properties
-// test comments are sent back in descending order
-// 404 : if article id isnt found / doesn't exist
-// 400 : if article_id is an invalid type
-
 describe("/api/articles/:article_id/comments", () => {
   test("GET 200: responds with an array of comments of the given article_id with specific properties", () => {
     return request(app)
