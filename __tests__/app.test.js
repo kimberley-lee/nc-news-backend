@@ -149,3 +149,24 @@ describe("/api/articles", () => {
       });
   });
 });
+
+// test for an array of comments of the given article id with specific properties
+// test comments are sent back in descending order
+describe("/api/articles/:article_id/comments", () => {
+  test("GET 200: responds with an array of comments of the given article_id with specific properties", () => {
+    return request(app)
+      .get("/api/articles/5/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        comments.forEach((comment) => {
+          expect(typeof comment.comment_id).toBe("number");
+          expect(typeof comment.votes).toBe("number");
+          expect(typeof comment.created_at).toBe("string");
+          expect(typeof comment.author).toBe("string");
+          expect(typeof comment.body).toBe("string");
+          expect(typeof comment.article_id).toBe("number");
+        });
+      });
+  });
+});
