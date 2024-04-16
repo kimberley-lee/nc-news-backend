@@ -4,9 +4,10 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
 const endpoints = require("../endpoints.json");
+const toBeSortedBy = require("jest-sorted");
 
 afterAll(() => {
-  db.end();
+  return db.end();
 });
 
 beforeEach(() => {
@@ -58,7 +59,7 @@ describe("/api/articles/:article_id", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body }) => {
-        expect(body).toMatchSnapshot({
+        expect(body).toMatchObject({
           article: {
             article_id: 1,
             title: "Living in the shadow of a great man",
@@ -73,6 +74,7 @@ describe("/api/articles/:article_id", () => {
         });
       });
   });
+
   test("GET 404: responds with an error if passed an article_id that doesn't exist", () => {
     return request(app)
       .get("/api/articles/100")
@@ -89,6 +91,61 @@ describe("/api/articles/:article_id", () => {
       .then(({ body }) => {
         const { message } = body;
         expect(message).toBe("Bad request");
+      });
+  });
+});
+
+describe("/api/articles", () => {
+  test("GET 200: responds with an array of article objects with specific properties", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(13);
+        articles.forEach((article) => {
+          expect(typeof article.article_id).toBe("number");
+          expect(typeof article.author).toBe("string");
+          expect(typeof article.title).toBe("string");
+          expect(typeof article.topic).toBe("string");
+          expect(typeof article.created_at).toBe("string");
+          expect(typeof article.article_img_url).toBe("string");
+          expect(typeof article.votes).toBe("number");
+          expect(typeof article.comment_count).toBe("number");
+        });
+      });
+  });
+
+  test("GET 200: responds with an array of article objects sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+
+  test("GET 200: responds with the correct number of comments", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        const firstArticle = articles.find((article) => {
+          return article.article_id === 9;
+        });
+        expect(firstArticle.comment_count).toBe(2);
+      });
+  });
+
+  test("GET 200: responds with an array of object properties without the 'body' property", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).not.toHaveProperty("body");
       });
   });
 });
