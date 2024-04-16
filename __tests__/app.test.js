@@ -152,6 +152,9 @@ describe("/api/articles", () => {
 
 // test for an array of comments of the given article id with specific properties
 // test comments are sent back in descending order
+// 404 : if article id isnt found / doesn't exist
+// 400 : if article_id is an invalid type
+
 describe("/api/articles/:article_id/comments", () => {
   test("GET 200: responds with an array of comments of the given article_id with specific properties", () => {
     return request(app)
@@ -167,6 +170,36 @@ describe("/api/articles/:article_id/comments", () => {
           expect(typeof comment.body).toBe("string");
           expect(typeof comment.article_id).toBe("number");
         });
+      });
+  });
+
+  test("GET 200: responds with an array of most recent comments", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+
+  test("GET 404: responds with an error message if article_id isn't found or is non-existant", () => {
+    return request(app)
+      .get("/api/articles/1000/comments")
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Article ID not found");
+      });
+  });
+
+  test("GET 400: responds with an error message if article_id is an invalid type", () => {
+    return request(app)
+      .get("/api/articles/hello/comments")
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Bad request");
       });
   });
 });
