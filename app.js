@@ -9,6 +9,7 @@ const {
 const {
   getComments,
   postComments,
+  deleteComment,
 } = require("./controllers/comments.controller");
 
 const app = express();
@@ -28,6 +29,8 @@ app.patch("/api/articles/:article_id", patchArticlesById);
 app.get("/api/articles/:article_id/comments", getComments);
 
 app.post("/api/articles/:article_id/comments", postComments);
+
+app.delete("/api/comments/:comment_id", deleteComment);
 
 //error handling middleware - extract
 app.use((err, req, res, next) => {
