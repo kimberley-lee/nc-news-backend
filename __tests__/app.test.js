@@ -213,6 +213,26 @@ describe("/api/articles", () => {
         expect(articles).not.toHaveProperty("body");
       });
   });
+  test("GET 200: responds with an array of objects filtered by a topic query", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(1);
+        articles.forEach((article) => {
+          expect(article.title).toBe(
+            "UNCOVERED: catspiracy to bring down democracy"
+          ),
+            expect(article.topic).toBe("cats"),
+            expect(article.author).toBe("rogersop"),
+            expect(article.created_at).toBe("2020-08-03T13:14:00.000Z");
+          expect(article.article_img_url).toBe(
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+          );
+        });
+      });
+  });
 });
 
 describe("/api/articles/:article_id/comments", () => {
