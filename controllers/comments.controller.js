@@ -1,4 +1,8 @@
-const { fetchComments, insertComments } = require("../models/comments.model");
+const {
+  fetchComments,
+  insertComments,
+  removeComment,
+} = require("../models/comments.model");
 const { checkArticleIDExists } = require("../models/articles.model");
 
 const getComments = (req, res, next) => {
@@ -20,4 +24,13 @@ const postComments = (req, res, next) => {
     .catch(next);
 };
 
-module.exports = { getComments, postComments };
+const deleteComment = (req, res, next) => {
+  const { comment_id } = req.params;
+  removeComment(comment_id)
+    .then(() => {
+      res.status(204).send();
+    })
+    .catch(next);
+};
+
+module.exports = { getComments, postComments, deleteComment };

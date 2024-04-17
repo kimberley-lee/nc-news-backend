@@ -19,4 +19,16 @@ const insertComments = (article_id, body, author) => {
     )
     .then(({ rows }) => rows[0]);
 };
-module.exports = { fetchComments, insertComments };
+
+const removeComment = (comment_id) => {
+  return db
+    .query(`DELETE FROM comments WHERE comment_id = $1 RETURNING *`, [
+      comment_id,
+    ])
+    .then(({ rows }) => {
+      if (!rows.length) {
+        return Promise.reject({ status: 404, message: "Not found" });
+      }
+    });
+};
+module.exports = { fetchComments, insertComments, removeComment };
