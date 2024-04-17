@@ -21,20 +21,19 @@ const fetchArticles = () => {
     .then(({ rows }) => rows);
 };
 
-const fetchArticlesById = (id) => {
+const fetchArticleById = (id) => {
   return db
     .query(`SELECT * FROM articles WHERE article_id = $1;`, [id])
     .then(({ rows }) => {
-      if (!rows.length) {
-        return Promise.reject({ status: 404, message: "Not found" });
-      }
-      return rows[0];
+      return rows.length
+        ? rows[0]
+        : Promise.reject({ status: 404, message: "Not found" });
     });
 };
 
 const checkArticleIDExists = (article_id) => {
   return db
-    .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
+    .query(`SELECT * FROM articles WHERE article_id = $1;`, [article_id])
     .then(({ rows }) => {
       if (!rows.length) {
         return Promise.reject({ status: 404, message: "Article ID not found" });
@@ -42,18 +41,22 @@ const checkArticleIDExists = (article_id) => {
     });
 };
 
-const updateArticlesById = (id, votes) => {
+const updateArticleById = (id, votes) => {
   return db
     .query(
-      `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`,
+      `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`,
       [votes, id]
     )
-    .then(({ rows }) => rows[0]);
+    .then(({ rows }) => {
+      return rows.length
+        ? rows[0]
+        : Promise.reject({ status: 404, message: "Not found" });
+    });
 };
 
 module.exports = {
-  fetchArticlesById,
+  fetchArticleById,
   fetchArticles,
   checkArticleIDExists,
-  updateArticlesById,
+  updateArticleById,
 };
