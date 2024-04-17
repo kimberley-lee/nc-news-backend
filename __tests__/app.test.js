@@ -233,6 +233,24 @@ describe("/api/articles", () => {
         });
       });
   });
+  test("GET 200: responds with an empty array when given a valid topic without any articles", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(0);
+      });
+  });
+  test("GET 404: responds with an error message if the topic is not found", () => {
+    return request(app)
+      .get("/api/articles?topic=dogs")
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Not found");
+      });
+  });
 });
 
 describe("/api/articles/:article_id/comments", () => {

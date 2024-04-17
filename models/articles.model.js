@@ -17,7 +17,7 @@ const fetchArticles = (topic) => {
 
   if (topic) {
     queryVal.push(topic);
-    queryStr += `WHERE topic=$1 `;
+    queryStr += `WHERE topic = $1 `;
   }
 
   queryStr += `GROUP BY articles.article_id
