@@ -1,6 +1,6 @@
 const {
   fetchComments,
-  insertComments,
+  insertComment,
   removeComment,
 } = require("../models/comments.model");
 const { checkArticleIDExists } = require("../models/articles.model");
@@ -14,12 +14,12 @@ const getComments = (req, res, next) => {
     .catch(next);
 };
 
-const postComments = (req, res, next) => {
+const postComment = (req, res, next) => {
   const { article_id } = req.params;
   const { body, author } = req.body;
-  insertComments(article_id, body, author)
-    .then((comments) => {
-      res.status(201).send(comments);
+  insertComment(article_id, body, author)
+    .then((comment) => {
+      res.status(201).send({ comment });
     })
     .catch(next);
 };
@@ -33,4 +33,4 @@ const deleteComment = (req, res, next) => {
     .catch(next);
 };
 
-module.exports = { getComments, postComments, deleteComment };
+module.exports = { getComments, postComment, deleteComment };

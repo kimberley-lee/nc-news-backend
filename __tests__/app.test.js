@@ -4,7 +4,6 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
 const endpoints = require("../endpoints.json");
-const toBeSortedBy = require("jest-sorted");
 
 afterAll(() => {
   return db.end();
@@ -92,58 +91,6 @@ describe("/api/articles/:article_id", () => {
         expect(message).toBe("Bad request");
       });
   });
-});
-
-describe("/api/articles", () => {
-  test("GET 200: responds with an array of article objects with specific properties", () => {
-    return request(app)
-      .get("/api/articles")
-      .expect(200)
-      .then(({ body }) => {
-        const { articles } = body;
-        expect(articles.length).toBe(13);
-        articles.forEach((article) => {
-          expect(typeof article.article_id).toBe("number");
-          expect(typeof article.author).toBe("string");
-          expect(typeof article.title).toBe("string");
-          expect(typeof article.topic).toBe("string");
-          expect(typeof article.created_at).toBe("string");
-          expect(typeof article.article_img_url).toBe("string");
-          expect(typeof article.votes).toBe("number");
-          expect(typeof article.comment_count).toBe("number");
-        });
-      });
-  });
-  test("GET 200: responds with an array of article objects sorted by date in descending order", () => {
-    return request(app)
-      .get("/api/articles")
-      .expect(200)
-      .then(({ body }) => {
-        const { articles } = body;
-        expect(articles).toBeSortedBy("created_at", { descending: true });
-      });
-  });
-  test("GET 200: responds with the correct number of comments", () => {
-    return request(app)
-      .get("/api/articles")
-      .expect(200)
-      .then(({ body }) => {
-        const { articles } = body;
-        const firstArticle = articles.find((article) => {
-          return article.article_id === 9;
-        });
-        expect(firstArticle.comment_count).toBe(2);
-      });
-  });
-  test("GET 200: responds with an array of object properties without the 'body' property", () => {
-    return request(app)
-      .get("/api/articles")
-      .expect(200)
-      .then(({ body }) => {
-        const { articles } = body;
-        expect(articles).not.toHaveProperty("body");
-      });
-  });
   test("PATCH 200: responds with an object of an updated article", () => {
     const update = {
       inc_votes: 1,
@@ -211,7 +158,59 @@ describe("/api/articles", () => {
       .send(update)
       .then(({ body }) => {
         const { message } = body;
-        expect(message).toBe("Article ID not found");
+        expect(message).toBe("Not found");
+      });
+  });
+});
+
+describe("/api/articles", () => {
+  test("GET 200: responds with an array of article objects with specific properties", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(13);
+        articles.forEach((article) => {
+          expect(typeof article.article_id).toBe("number");
+          expect(typeof article.author).toBe("string");
+          expect(typeof article.title).toBe("string");
+          expect(typeof article.topic).toBe("string");
+          expect(typeof article.created_at).toBe("string");
+          expect(typeof article.article_img_url).toBe("string");
+          expect(typeof article.votes).toBe("number");
+          expect(typeof article.comment_count).toBe("number");
+        });
+      });
+  });
+  test("GET 200: responds with an array of article objects sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("GET 200: responds with the correct number of comments", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        const firstArticle = articles.find((article) => {
+          return article.article_id === 9;
+        });
+        expect(firstArticle.comment_count).toBe(2);
+      });
+  });
+  test("GET 200: responds with an array of object properties without the 'body' property", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).not.toHaveProperty("body");
       });
   });
 });
@@ -279,7 +278,8 @@ describe("/api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(201)
       .then(({ body }) => {
-        expect(body).toEqual({
+        const { comment } = body;
+        expect(comment).toEqual({
           article_id: 2,
           comment_id: 19,
           votes: 0,
@@ -313,6 +313,34 @@ describe("/api/articles/:article_id/comments", () => {
       .then(({ body }) => {
         const { message } = body;
         expect(message).toBe("Bad request");
+      });
+  });
+  test("POST 400: responds with an error message if user tries to post an invalid id", () => {
+    const newComment = {
+      body: "I love butter.",
+      author: "butter_bridge",
+    };
+    return request(app)
+      .post("/api/articles/lemons/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Bad request");
+      });
+  });
+  test("POST 404: responds with an error message if user tries to post an id that isn't found", () => {
+    const newComment = {
+      body: "I love butter.",
+      author: "butter_bridge",
+    };
+    return request(app)
+      .post("/api/articles/1000/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Not found");
       });
   });
 });
