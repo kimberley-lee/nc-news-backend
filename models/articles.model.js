@@ -1,6 +1,23 @@
 const db = require("../db/connection");
 
-const fetchArticles = (topic) => {
+const fetchArticles = (topic, sort_by = "created_at", order = "desc") => {
+  let orderType = "DESC";
+  if (order === "asc") {
+    orderType = "ASC";
+  }
+  const validSortBys = [
+    "created_at",
+    "topic",
+    "title",
+    "author",
+    "votes",
+    "article_img_url",
+  ];
+
+  if (!validSortBys.includes(sort_by)) {
+    return Promise.reject({ status: 400, message: "Invalid input" });
+  }
+
   let queryVal = [];
   let queryStr = `SELECT
     articles.article_id, 
@@ -20,10 +37,15 @@ const fetchArticles = (topic) => {
     queryStr += `WHERE topic = $1 `;
   }
 
-  queryStr += `GROUP BY articles.article_id
-  ORDER BY articles.created_at DESC;`;
+  queryStr += `GROUP BY articles.article_id `;
 
-  return db.query(queryStr, queryVal).then(({ rows }) => rows);
+  if (sort_by === "created_at") {
+    queryStr += `ORDER BY ${sort_by} ${orderType}`;
+  } else if (validSortBys) {
+    queryStr += `ORDER BY ${sort_by} ${orderType}`;
+  }
+
+  return db.query(queryStr, queryVal).then(({ rows }) => rows); // promise.reject?
 };
 
 const fetchArticleById = (id) => {

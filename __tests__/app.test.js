@@ -58,18 +58,17 @@ describe("/api/articles/:article_id", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body }) => {
-        expect(body).toMatchObject({
-          article: {
-            article_id: 1,
-            title: "Living in the shadow of a great man",
-            topic: "mitch",
-            author: "butter_bridge",
-            body: "I find this existence challenging",
-            created_at: expect.any(String),
-            votes: 100,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          },
+        const { article } = body;
+        expect(article).toMatchObject({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: expect.any(String),
+          votes: 100,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
         });
       });
   });
@@ -267,6 +266,33 @@ describe("/api/articles", () => {
       .then(({ body }) => {
         const { message } = body;
         expect(message).toBe("Not found");
+      });
+  });
+  test("GET 200: responds with an article object sorted by specified column", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("title", { descending: true });
+      });
+  });
+  test("GET 200: responds with an article object ordered by ascending or descending", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("created_at", { descending: false });
+      });
+  });
+  test("GET 404: responds with an error message if an incorrect column is queried", () => {
+    return request(app)
+      .get("/api/articles?sort_by=txpic")
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Invalid input");
       });
   });
 });
