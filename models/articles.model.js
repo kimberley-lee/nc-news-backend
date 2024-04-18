@@ -1,24 +1,29 @@
 const db = require("../db/connection");
 
-const fetchArticles = () => {
-  return db
-    .query(
-      `SELECT 
-        articles.article_id, 
-        articles.author, 
-        articles.title, 
-        articles.topic, 
-        articles.created_at, 
-        articles.article_img_url, 
-        articles.votes, 
-        COUNT(comments.article_id)::INT AS comment_count 
-      FROM articles 
-      LEFT JOIN comments 
-      ON comments.article_id = articles.article_id 
-      GROUP BY articles.article_id
-      ORDER BY articles.created_at DESC;`
-    )
-    .then(({ rows }) => rows);
+const fetchArticles = (topic) => {
+  let queryVal = [];
+  let queryStr = `SELECT
+    articles.article_id, 
+    articles.author, 
+    articles.title, 
+    articles.topic, 
+    articles.created_at, 
+    articles.article_img_url, 
+    articles.votes, 
+    COUNT(comments.article_id)::INT AS comment_count 
+    FROM articles 
+    LEFT JOIN comments 
+    ON comments.article_id = articles.article_id `;
+
+  if (topic) {
+    queryVal.push(topic);
+    queryStr += `WHERE topic = $1 `;
+  }
+
+  queryStr += `GROUP BY articles.article_id
+  ORDER BY articles.created_at DESC;`;
+
+  return db.query(queryStr, queryVal).then(({ rows }) => rows);
 };
 
 const fetchArticleById = (id) => {

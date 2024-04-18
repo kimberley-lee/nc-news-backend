@@ -2,12 +2,13 @@ const {
   fetchArticleById,
   fetchArticles,
   updateArticleById,
-  checkArticleIDExists,
 } = require("../models/articles.model");
+const { checkTopicExists } = require("../models/topics.model");
 
 const getArticles = (req, res, next) => {
-  fetchArticles()
-    .then((articles) => {
+  const { topic } = req.query;
+  Promise.all([fetchArticles(topic), checkTopicExists(topic)])
+    .then(([articles]) => {
       res.status(200).send({ articles });
     })
     .catch(next);
