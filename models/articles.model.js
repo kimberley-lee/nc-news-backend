@@ -28,7 +28,24 @@ const fetchArticles = (topic) => {
 
 const fetchArticleById = (id) => {
   return db
-    .query(`SELECT * FROM articles WHERE article_id = $1;`, [id])
+    .query(
+      `SELECT
+      articles.article_id, 
+      articles.author, 
+      articles.title, 
+      articles.topic, 
+      articles.body,
+      articles.created_at, 
+      articles.article_img_url, 
+      articles.votes,
+      COUNT(comments.article_id)::INT AS comment_count 
+    FROM articles
+    LEFT JOIN comments
+    ON comments.article_id = articles.article_id
+    WHERE articles.article_id = $1
+    GROUP BY articles.article_id;`,
+      [id]
+    )
     .then(({ rows }) => {
       return rows.length
         ? rows[0]
