@@ -34,4 +34,22 @@ const removeComment = (comment_id) => {
     });
 };
 
-module.exports = { fetchComments, insertComment, removeComment };
+const updateCommentByCommentId = (id, votes) => {
+  return db
+    .query(
+      `UPDATE comments SET votes = votes + $1 WHERE comment_id = $2 RETURNING *`,
+      [votes, id]
+    )
+    .then(({ rows }) => {
+      return rows.length
+        ? rows[0]
+        : Promise.reject({ status: 404, message: "Not found" });
+    });
+};
+
+module.exports = {
+  fetchComments,
+  insertComment,
+  removeComment,
+  updateCommentByCommentId,
+};
