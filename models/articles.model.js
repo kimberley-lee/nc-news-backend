@@ -45,7 +45,7 @@ const fetchArticles = (topic, sort_by = "created_at", order = "desc") => {
     queryStr += `ORDER BY ${sort_by} ${orderType}`;
   }
 
-  return db.query(queryStr, queryVal).then(({ rows }) => rows); // promise.reject?
+  return db.query(queryStr, queryVal).then(({ rows }) => rows);
 };
 
 const fetchArticleById = (id) => {
@@ -98,9 +98,30 @@ const updateArticleById = (id, votes) => {
     });
 };
 
+const insertArticle = (
+  author,
+  title,
+  topic,
+  body,
+  article_img_url = "https://images.pexels.com/photos/6045017/pexels-photo-6045017.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+) => {
+  const validKeys = [author, title, topic, body, article_img_url];
+  return db
+    .query(
+      `INSERT INTO articles(author, title, topic, body, article_img_url) VALUES($1, $2, $3, $4, $5) RETURNING *;`,
+      validKeys
+    )
+    .then(({ rows }) => {
+      console.log(rows);
+      rows[0].comment_count = 0;
+      return rows[0];
+    });
+};
+
 module.exports = {
   fetchArticleById,
   fetchArticles,
   checkArticleIDExists,
   updateArticleById,
+  insertArticle,
 };

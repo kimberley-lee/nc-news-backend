@@ -36,6 +36,32 @@
       ]
     }
   },
+  "POST/api/articles": {
+    "description": "posts an article with a default image_url",
+    "queries": [],
+    "exampleRequest": {
+      "article": [
+        {
+          "author": "lurker",
+          "title": "Catam Ondra climbs world's hardest route",
+          "topic": "cats",
+          "body": "How does he do it? The man is a beast.",
+          "article_img_url": "https://www.lasportiva.com/media/mageplaza/blog/post/a/o/ao-2_1.jpg"
+        }
+      ]
+    },
+    "exampleResponse": {
+      "author": "lurker",
+      "title": "Catam Ondra climbs world's hardest route",
+      "topic": "cats",
+      "body": "How does he do it? The man is a beast.",
+      " article_img_url": "https://www.lasportiva.com/media/mageplaza/blog/post/a/o/ao-2_1.jpg",
+      "article_id": 14,
+      "votes": 0,
+      " created_at": "expect.any(String)",
+      " comment_count": 0
+    }
+  },
   "GET /api/articles/:article_id": {
     "description": "serves an array of articles that match article_id",
     "queries": [],

@@ -295,6 +295,86 @@ describe("/api/articles", () => {
         expect(message).toBe("Invalid input");
       });
   });
+  test("POST 201: responds with a new article including extra specific properties", () => {
+    const newArticle = {
+      author: "lurker",
+      title: "Catam Ondra climbs world's hardest route",
+      topic: "cats",
+      body: "How does he do it? The man is a beast.",
+      article_img_url:
+        "https://www.lasportiva.com/media/mageplaza/blog/post/a/o/ao-2_1.jpg",
+    };
+    return request(app)
+      .post("/api/articles")
+      .expect(201)
+      .send(newArticle)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).toEqual({
+          author: "lurker",
+          title: "Catam Ondra climbs world's hardest route",
+          topic: "cats",
+          body: "How does he do it? The man is a beast.",
+          article_img_url:
+            "https://www.lasportiva.com/media/mageplaza/blog/post/a/o/ao-2_1.jpg",
+          article_id: 14,
+          votes: 0,
+          created_at: expect.any(String),
+          comment_count: 0,
+        });
+      });
+  });
+  test("POST 400: responds with an error message when given an object without a required property", () => {
+    const newArticle = {
+      author: "lurker",
+      topic: "cats",
+      body: "How does he do it? The man is a beast.",
+      article_img_url:
+        "https://www.lasportiva.com/media/mageplaza/blog/post/a/o/ao-2_1.jpg",
+    };
+    return request(app)
+      .post("/api/articles")
+      .expect(400)
+      .send(newArticle)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Bad request");
+      });
+  });
+  test("POST 201: responds with a new article with a default url_img if not given one", () => {
+    const newArticle = {
+      author: "lurker",
+      title: "Catam Ondra climbs world's hardest route",
+      topic: "cats",
+      body: "How does he do it? The man is a beast.",
+    };
+    return request(app)
+      .post("/api/articles")
+      .expect(201)
+      .send(newArticle)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article.article_img_url).toBe(
+          "https://images.pexels.com/photos/6045017/pexels-photo-6045017.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+        );
+      });
+  });
+  test("POST 404: responds with an error message if the author is not found", () => {
+    const newArticle = {
+      author: "climbing_cat",
+      title: "Catam Ondra climbs world's hardest route",
+      topic: "cats",
+      body: "How does he do it? The man is a beast.",
+    };
+    return request(app)
+      .post("/api/articles")
+      .expect(404)
+      .send(newArticle)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Not found");
+      });
+  });
 });
 
 describe("/api/articles/:article_id/comments", () => {
