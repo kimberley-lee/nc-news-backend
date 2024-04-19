@@ -449,6 +449,39 @@ describe("/api/comments/:comment_id", () => {
         expect(message).toBe("Bad request");
       });
   });
+  test("PATCH 200: responds with an updated numbers of votes in comment", () => {
+    const updateVotes = { inc_votes: 4 };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(updateVotes)
+      .expect(200)
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toMatchObject({ votes: 20 });
+      });
+  });
+  test("PATCH 400: responds with an error message if comment_id is invalid", () => {
+    const updateVotes = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/comments/crackers")
+      .send(updateVotes)
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Bad request");
+      });
+  });
+  test("PATCH 404: responds with an error message if comment_id is not found", () => {
+    const updateVotes = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/comments/200")
+      .send(updateVotes)
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Not found");
+      });
+  });
 });
 
 describe("/api/users", () => {
