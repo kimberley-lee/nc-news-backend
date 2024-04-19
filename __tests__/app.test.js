@@ -187,7 +187,7 @@ describe("/api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles.length).toBe(13);
+        expect(articles.length).toBe(10);
         articles.forEach((article) => {
           expect(typeof article.article_id).toBe("number");
           expect(typeof article.author).toBe("string");
@@ -373,6 +373,74 @@ describe("/api/articles", () => {
       .then(({ body }) => {
         const { message } = body;
         expect(message).toBe("Not found");
+      });
+  });
+  test("GET 200: responds with a number of articles limited by the query", () => {
+    return request(app)
+      .get("/api/articles?limit=4")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(4);
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            author: expect.any(String),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
+      });
+  });
+  test("GET 200: responds with a number of articles limited to a default of 10 if not passed a number", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(10);
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            author: expect.any(String),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
+      });
+  });
+  test("GET 400: responds with an error message if query limit is invalid", () => {
+    return request(app)
+      .get("/api/articles?limit=biscuits")
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Bad request");
+      });
+  });
+  test("GET 200: responds with a page of articles from specified p query", () => {
+    return request(app)
+      .get("/api/articles?p=2")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(3);
+      });
+  });
+  test("GET 200: responds with an article object and empty array if p query exceeds pages of articles", () => {
+    return request(app)
+      .get("/api/articles?p=6")
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body);
+        const { articles } = body;
+        expect(articles.length).toBe(0);
       });
   });
 });
