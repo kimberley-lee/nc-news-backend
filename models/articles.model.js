@@ -1,6 +1,12 @@
 const db = require("../db/connection");
 
-const fetchArticles = (topic, sort_by = "created_at", order = "desc") => {
+const fetchArticles = (
+  topic,
+  sort_by = "created_at",
+  order = "desc",
+  limit = 10,
+  p
+) => {
   let orderType = "DESC";
   if (order === "asc") {
     orderType = "ASC";
@@ -38,13 +44,17 @@ const fetchArticles = (topic, sort_by = "created_at", order = "desc") => {
   }
 
   queryStr += `GROUP BY articles.article_id `;
+  queryStr += `ORDER BY ${sort_by} ${orderType} `;
 
-  if (sort_by === "created_at") {
-    queryStr += `ORDER BY ${sort_by} ${orderType}`;
-  } else if (validSortBys) {
-    queryStr += `ORDER BY ${sort_by} ${orderType}`;
+  if (limit) {
+    queryVal.push(limit);
+    queryStr += `LIMIT $${queryVal.length} `;
   }
-
+  if (p) {
+    const offset = limit * p - limit;
+    queryVal.push(offset);
+    queryStr += `OFFSET $${queryVal.length};`;
+  }
   return db.query(queryStr, queryVal).then(({ rows }) => rows);
 };
 
@@ -112,16 +122,27 @@ const insertArticle = (
       validKeys
     )
     .then(({ rows }) => {
-      console.log(rows);
       rows[0].comment_count = 0;
       return rows[0];
     });
 };
 
+const getTotalCount = (topic, sort_by, order, limit, p) => {
+  let queryStr = `SELECT COUNT(article_id)::INT AS total_count FROM articles `;
+  const queryValues = [];
+  if (topic) {
+    queryStr += `WHERE topic = $1;`;
+    queryValues.push(topic);
+  }
+  return db.query(queryStr, queryValues).then(({ rows }) => {
+    return rows[0].total_count;
+  });
+};
 module.exports = {
   fetchArticleById,
   fetchArticles,
   checkArticleIDExists,
   updateArticleById,
   insertArticle,
+  getTotalCount,
 };
