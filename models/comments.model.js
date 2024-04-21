@@ -1,12 +1,22 @@
 const db = require("../db/connection");
 
-const fetchComments = (article_id) => {
-  return db
-    .query(
-      `SELECT * FROM comments WHERE comments.article_id = $1 ORDER BY comments.created_at DESC;`,
-      [article_id]
-    )
-    .then(({ rows }) => rows);
+const fetchComments = (article_id, limit = 10, p) => {
+  let queryStr = `SELECT * FROM comments 
+  WHERE comments.article_id = $1 
+  ORDER BY comments.created_at DESC `;
+  const queryValues = [article_id];
+
+  if (limit) {
+    queryValues.push(limit);
+    queryStr += `LIMIT $${queryValues.length} `;
+  }
+  if (p) {
+    const offset = limit * p - limit;
+    queryValues.push(offset);
+    queryStr += `OFFSET $${queryValues.length};`;
+  }
+
+  return db.query(queryStr, queryValues).then(({ rows }) => rows);
 };
 
 const insertComment = (article_id, body, author) => {

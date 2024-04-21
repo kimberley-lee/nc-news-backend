@@ -588,6 +588,61 @@ describe("/api/articles/:article_id/comments", () => {
         expect(message).toBe("Not found");
       });
   });
+  test("GET 200: responds with a number of comments limited by a default of 10", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments.length).toBe(10);
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            body: expect.any(String),
+            votes: expect.any(Number),
+            author: expect.any(String),
+            article_id: expect.any(Number),
+            created_at: expect.any(String),
+          });
+        });
+      });
+  });
+  test("GET 200: responds with a number of comments limited by the query", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments.length).toBe(5);
+      });
+  });
+  test("GET 400: responds with an error message if query limit is invalid", () => {
+    return request(app)
+      .get("/api/articles/2/comments?limit=merlin")
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Bad request");
+      });
+  });
+  test("GET 200: responds with a page of comments from specified p query", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=2")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments.length).toBe(1);
+      });
+  });
+  test("GET 200: responds with an comments object and empty array if p query exceeds pages of comments", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=3")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments.length).toBe(0);
+      });
+  });
 });
 
 describe("/api/comments/:comment_id", () => {
