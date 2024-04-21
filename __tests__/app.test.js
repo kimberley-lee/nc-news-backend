@@ -438,9 +438,24 @@ describe("/api/articles", () => {
       .get("/api/articles?p=6")
       .expect(200)
       .then(({ body }) => {
-        console.log(body);
         const { articles } = body;
         expect(articles.length).toBe(0);
+      });
+  });
+  test("GET 200: responds with an object with a total_count property of all articles", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.total_count).toBe(13);
+      });
+  });
+  test("GET 200: responds with an object with a total_count property that displays the total of relevant articles", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.total_count).toBe(12);
       });
   });
 });

@@ -127,10 +127,22 @@ const insertArticle = (
     });
 };
 
+const getTotalCount = (topic, sort_by, order, limit, p) => {
+  let queryStr = `SELECT COUNT(article_id)::INT AS total_count FROM articles `;
+  const queryValues = [];
+  if (topic) {
+    queryStr += `WHERE topic = $1;`;
+    queryValues.push(topic);
+  }
+  return db.query(queryStr, queryValues).then(({ rows }) => {
+    return rows[0].total_count;
+  });
+};
 module.exports = {
   fetchArticleById,
   fetchArticles,
   checkArticleIDExists,
   updateArticleById,
   insertArticle,
+  getTotalCount,
 };

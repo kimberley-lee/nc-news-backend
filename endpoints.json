@@ -10,7 +10,7 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles with a default limit of 10",
+    "description": "serves an array of all articles with a default limit of 10 and a total_count of number of articles property",
     "queries": [
       "author",
       "title",
@@ -35,7 +35,8 @@
           "votes": 0,
           "comment_count": 6
         }
-      ]
+      ],
+      "total_count": 1
     }
   },
   "POST/api/articles": {
