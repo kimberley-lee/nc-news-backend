@@ -204,6 +204,38 @@ describe("/api/articles/:article_id", () => {
         });
       });
   });
+  test("DELETE 204: responds with no content from associated article_id and an error message when retrieving comments with associated article_id", () => {
+    return request(app)
+      .delete("/api/articles/1")
+      .expect(204)
+      .then(() => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(404)
+          .then(({ body }) => {
+            const { message } = body;
+            expect(message).toBe("Article ID not found");
+          });
+      });
+  });
+  test("DELETE 404: responds with an error message if article_id isn't found", () => {
+    return request(app)
+      .delete("/api/articles/100")
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Not found");
+      });
+  });
+  test("DELETE 400: responds with an error message if article_id is invalid or of the incorrect type", () => {
+    return request(app)
+      .delete("/api/articles/chocolate")
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Bad request");
+      });
+  });
 });
 
 describe("/api/articles", () => {

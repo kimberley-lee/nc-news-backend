@@ -4,8 +4,10 @@ const {
   updateArticleById,
   insertArticle,
   getTotalCount,
+  removeArticleById,
 } = require("../models/articles.model");
 const { checkTopicExists } = require("../models/topics.model");
+const { getComments } = require("../controllers/comments.controller");
 
 const getArticles = (req, res, next) => {
   const { topic, sort_by, order, limit, p } = req.query;
@@ -48,4 +50,19 @@ const postArticle = (req, res, next) => {
     .catch(next);
 };
 
-module.exports = { getArticleById, getArticles, patchArticleById, postArticle };
+const deleteArticleById = (req, res, next) => {
+  const { article_id } = req.params;
+  removeArticleById(article_id)
+    .then(() => {
+      res.status(204).send();
+    })
+    .catch(next);
+};
+
+module.exports = {
+  getArticleById,
+  getArticles,
+  patchArticleById,
+  postArticle,
+  deleteArticleById,
+};
