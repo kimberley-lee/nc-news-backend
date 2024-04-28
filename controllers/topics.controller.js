@@ -10,8 +10,10 @@ const getTopics = (req, res, next) => {
 
 const postTopic = (req, res, next) => {
   const { description, slug } = req.body;
-  insertTopic(description, slug).then((topic) => {
-    res.status(201).send({ topic });
-  });
+  insertTopic(description, slug)
+    .then((topic) => {
+      res.status(201).send({ topic });
+    })
+    .catch(next);
 };
 module.exports = { getTopics, postTopic };

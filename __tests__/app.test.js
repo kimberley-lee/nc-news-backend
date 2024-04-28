@@ -54,6 +54,17 @@ describe("/api/topics", () => {
         });
       });
   });
+  test("POST 400: responds with an error message if the posted comment doesn't have required properties", () => {
+    const newTopic = { description: "Dogs are cooler than cats" };
+    return request(app)
+      .post("/api/topics")
+      .expect(400)
+      .send(newTopic)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Bad request");
+      });
+  });
 });
 
 describe("/api", () => {

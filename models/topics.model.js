@@ -22,7 +22,11 @@ const insertTopic = (description, slug) => {
       `INSERT INTO topics(description, slug) VALUES ($1, $2) RETURNING *`,
       [description, slug]
     )
-    .then(({ rows }) => rows);
+    .then(({ rows }) => {
+      return !rows.length
+        ? Promise.reject({ status: 400, message: "Bad request" })
+        : rows;
+    });
 };
 
 module.exports = { fetchTopics, checkTopicExists, insertTopic };
