@@ -16,4 +16,13 @@ const checkTopicExists = (topic) => {
   }
 };
 
-module.exports = { fetchTopics, checkTopicExists };
+const insertTopic = (description, slug) => {
+  return db
+    .query(
+      `INSERT INTO topics(description, slug) VALUES ($1, $2) RETURNING *`,
+      [description, slug]
+    )
+    .then(({ rows }) => rows);
+};
+
+module.exports = { fetchTopics, checkTopicExists, insertTopic };

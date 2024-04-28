@@ -39,6 +39,21 @@ describe("/api/topics", () => {
         });
       });
   });
+  test("POST 201: responds with an object with specific properties", () => {
+    const newTopic = { description: "Dune 2", slug: "science-fiction" };
+    return request(app)
+      .post("/api/topics")
+      .expect(201)
+      .send(newTopic)
+      .then(({ body }) => {
+        const { topic } = body;
+        expect(topic.length).toBe(1);
+        topic.forEach((topic) => {
+          expect(topic.description).toBe("Dune 2");
+          expect(topic.slug).toBe("science-fiction");
+        });
+      });
+  });
 });
 
 describe("/api", () => {
