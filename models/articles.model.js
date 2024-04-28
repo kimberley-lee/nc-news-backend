@@ -138,6 +138,19 @@ const getTotalCount = (topic, sort_by, order, limit, p) => {
     return rows[0].total_count;
   });
 };
+
+const removeArticleById = (article_id) => {
+  return db
+    .query(`DELETE FROM articles WHERE article_id = $1 RETURNING *`, [
+      article_id,
+    ])
+    .then(({ rows }) => {
+      return !rows.length
+        ? Promise.reject({ status: 404, message: "Not found" })
+        : rows;
+    });
+};
+
 module.exports = {
   fetchArticleById,
   fetchArticles,
@@ -145,4 +158,5 @@ module.exports = {
   updateArticleById,
   insertArticle,
   getTotalCount,
+  removeArticleById,
 };
