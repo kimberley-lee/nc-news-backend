@@ -335,7 +335,7 @@ describe("/api/articles", () => {
         expect(articles).toBeSortedBy("title", { descending: true });
       });
   });
-  test.only("GET 200: responds with an article object sorted by comment_count", () => {
+  test("GET 200: responds with an article object sorted by comment_count", () => {
     return request(app)
       .get("/api/articles?sort_by=comment_count")
       .expect(200)
