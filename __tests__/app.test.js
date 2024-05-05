@@ -335,6 +335,15 @@ describe("/api/articles", () => {
         expect(articles).toBeSortedBy("title", { descending: true });
       });
   });
+  test.only("GET 200: responds with an article object sorted by comment_count", () => {
+    return request(app)
+      .get("/api/articles?sort_by=comment_count")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("comment_count", { descending: true });
+      });
+  });
   test("GET 200: responds with an article object ordered by ascending or descending", () => {
     return request(app)
       .get("/api/articles?order=asc")

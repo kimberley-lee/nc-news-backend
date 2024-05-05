@@ -18,6 +18,7 @@ const fetchArticles = (
     "author",
     "votes",
     "article_img_url",
+    "comment_count",
   ];
 
   if (!validSortBys.includes(sort_by)) {
